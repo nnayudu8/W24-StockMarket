@@ -18,8 +18,8 @@ show_pages(
         Page("pages/indicators.py", "Technical Indicators", ":money_with_wings:"),
         Section(name="Model Results", icon=":chart_with_upwards_trend:"),
         Page("pages/base/base_model.py", "Base Model", ":dollar:"),
-        Page("pages/nvidia/david.py", "David", ":euro:"),
-        Page("pages/nvidia/nvidia.py", "NVIDIA", ":pound:"),
+        Page("pages/nvidia/nvidia.py", "NVIDIA", ":euro:"),
+        Page("pages/nvidia/nvidia2.py", "NVIDIA v2", ":pound:"),
         Page("pages/soon.py", "Coming Soon...", ":eyes:"),
     ]
 )
@@ -32,7 +32,7 @@ st.write(
 
 ***
 
-**⇦ Check the tabs to the left for research and model-specific results!**
+**⇦ Check the tabs to the left for research and model-specific results!** (top left corner for mobile users)
 
 ***
 

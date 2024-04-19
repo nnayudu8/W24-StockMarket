@@ -36,6 +36,7 @@ from keras.layers import Dense, Dropout, LSTM, Input, Activation, concatenate
 import numpy as np
 import st_pages
 from st_pages import Page, show_pages, Section, add_page_title
+import pickle
 
 st.markdown("""
 <style>
@@ -52,8 +53,8 @@ show_pages(
         Page("pages/indicators.py", "Technical Indicators", ":money_with_wings:"),
         Section(name="Model Results", icon=":chart_with_upwards_trend:"),
         Page("pages/base/base_model.py", "Base Model", ":dollar:"),
-        Page("pages/david/david.py", "David", ":euro:"),
-        Page("pages/david/presentation.py", "Shayan", ":pound:"),
+        Page("pages/nvidia/nvidia.py", "NVIDIA", ":euro:"),
+        Page("pages/nvidia/nvidia2.py", "NVIDIA v2", ":pound:"),
         Page("pages/soon.py", "Coming Soon...", ":eyes:"),
     ]
 )
@@ -61,6 +62,24 @@ show_pages(
 st_pages.add_indentation()
 
 def main():
+
+    cc1, cc2 = st.columns([0.8, 0.2])
+    with cc1:
+        st.title("NVIDIA Overall Trend Prediction")
+
+    with cc2:
+        st.image("images/nvidia_logo.png", width=175)
+
+    st.write(
+        '''
+        ***
+        NVIDIA has been a hot company and we want to hop on that train! In this version of the model, we set out to find the most relevant factors in predicting
+        their next trend in next close so that we know what factors are important. This is intended for general price prediction.
+
+        ⇨ Shayan Sinha and David Sanico
+        ***
+    '''
+    )
 
     data = yf.download(tickers = 'NVDA')
 
@@ -99,6 +118,55 @@ def main():
     data['BBM'] = bbands_df['BBM_5_2.0'] #middle
     data['BBU'] = bbands_df['BBU_5_2.0'] #upper
 
+    st.header("Exploratory Data Analysis")
+
+    st.write("We utilized a variety of technical indicators to factor in as many unique factors that we could!")
+
+    st.subheader("Adjusted Close")
+    st.write('''Here is the adjusted close of NVIDIA stock everyday since around the year 2000! From this, we understood
+             that the stock has recently been a lot more volatile, and that is something for which we need to account.''')
+    plt.figure(figsize=(16,8))
+    plt.plot(data["Adj Close"], color = 'black', label = 'Price')
+    plt.title("Adjusted Close")
+    st.pyplot(plt)
+
+    st.subheader("Exponential Moving Averages")
+    st.write('''These indicators let us make momentum-based predictions. Intersections between the black dotted line and the
+             others indicates a potential trend change. For NVIDIA, it seems that there have been many more positive trends
+             lately than negative ones! Feel free to refer to the ***Technical Indicators*** tab for a full description of EMAs.''')
+    plt.figure(figsize=(16,8))
+    plt.plot(data["Adj Close"], '--', color = 'black', label = 'Adj Close', linewidth = 1)
+    plt.plot(data["EMAF"], color = 'purple', label = 'EMAF', linewidth = 1)
+    plt.plot(data["EMAM"], color = 'green', label = 'EMAM', linewidth = 1)
+    plt.plot(data["EMAS"], color = 'blue', label = 'EMAS', linewidth = 1)
+    plt.title("Exponential Moving Averages")
+    plt.legend()
+    plt.xlim(17000, 19850)
+    st.pyplot(plt)
+
+    st.subheader("Trend Strength Indicators")
+    st.write('''These indicators tell us about the strength of the stock and their trends. We can see that NVIDIA goes through
+             cycles of strong and weak trends fairly normally, which is expected as the market adjusts to news and fluctuating prices!
+             Feel free to refer to the ***Technical Indicators*** tab for a full description on ADX and RSI.''')
+    plt.figure(figsize=(16,4))
+    plt.plot(data["ADX"], color = 'red', label = 'ADX')
+    #plt.plot(data["STOCH"], color = 'blue', label = 'Price')
+    plt.plot(data["RSI"], color = 'black', label = 'RSI')
+    plt.title("Trend Strength")
+    plt.legend()
+    plt.xlim(17000, 19850)
+    st.pyplot(plt)
+
+    st.subheader("On-Balance Volume")
+    st.write('''We see that the OBV is consistently increasing for NVIDIA which is an indicator of rising stock prices, 
+             since there is a high volume pressure! Feel free to refer to the ***Technical Indicators*** tab for a full
+             description of OBX.''')
+    plt.figure(figsize=(16,8))
+    plt.plot(data["OBV"], color = 'blue', label = 'OBV')
+    plt.title("On-Balance Volume")
+    plt.legend()
+    st.pyplot(plt)
+
 
     ###DATASET INDEXING###
     data['Target'] = data['Adj Close']-data.Open
@@ -129,9 +197,7 @@ def main():
     # print(data_set.loc[:, data_set.columns != target_col])
     # print(response_scaled)
     data_set_scaled = sc_data.fit_transform(data_set.loc[:, data_set.columns != target_col])
-    print(data_set_scaled.shape)
     # print(data_set_scaled)
-    print(len(data_set_scaled))
     data_set_scaled_new = []
     for i in range(len(data_set_scaled)):
         data_set_scaled_new.append([])
@@ -143,14 +209,12 @@ def main():
         # print("#"*80)
 
     data_set_scaled_new = np.asarray(data_set_scaled_new)
-    print(data_set_scaled_new)
 
     # multiple feature from data provided to the model
     X = []
     #print(data_set_scaled[0].size)
     #data_set_scaled=data_set.values
     backcandles = 30
-    print(data_set_scaled_new.shape[0])
     for j in range(15):#data_set_scaled_new[0].size):#2 columns are target not X
         X.append([])
         for i in range(backcandles, data_set_scaled_new.shape[0]):#backcandles+2
@@ -174,34 +238,55 @@ def main():
 
     
     #tf.random.set_seed(20)
-    model = keras.models.load_model('davidStock.keras')
+    # model = keras.models.load_model('davidStock.keras')
 
-    y_pred = model.predict(X_test)
+    with open("pages/nvidia/nvidia2_y_pred.pkl", 'rb') as f:
+        y_pred = pickle.load(f)
+
+    # y_pred = model.predict(X_test)
     #y_pred=np.where(y_pred > 0.43, 1,0)
-    for i in range(10):
-        print(y_pred[i], y_test[i])
 
-    print(sc_response.inverse_transform(y_test)[0])
-    print(sc_response.inverse_transform(y_pred)[0])
+    # print(sc_response.inverse_transform(y_test)[0])
+    # print(sc_response.inverse_transform(y_pred)[0])
 
     plt.figure(figsize=(16,9))
     plt.plot(y_test, color = 'black', label = 'Test')
     plt.plot(y_pred, color = 'green', label = 'pred')
     plt.legend()
 
-    st.header("Graph of stock price vs predicted stock price")
+    st.write(
+        '''***'''
+    )
+
+    st.header("Results")
+    st.write(
+        '''
+        The neural network architecture from the base model seemed to work well, even though it is simple. We hypothesize that
+        it is due to the format of input data to the neural network (range of data per input through candles). The following is our results and evaluations.
+    '''
+    )
+
+    st.subheader("Prediction")
     st.pyplot(plt)
+    st.subheader("Model Evaluation")
     #add RMSE and MAPE calculations
     #RMSE = Root Mean Squared Error
     rmse = np.sqrt(np.mean((y_test - y_pred) ** 2))
-    print("RMSE: ", end="")
-    print(rmse)
+
+    rounded = round(rmse, 3) 
+
+    st.write(f"The Root-Mean Squared Error (RMSE) of the model was {rounded}")
 
 
     #MAPE = Mean Absolute Percentage Error
     mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
-    print("MAPE (%): ", end="")
-    print(mape)
+
+    rounded = round(mape, 2) 
+
+    st.write(f"The Mean Absolute Percentage Error (MAPE) of the model was {rounded}%")
+
+    st.write('''Considering the volatility of NVIDIA stock, these indicators (RSI, EMAs, ADX, OBV) seemed to contain 
+             some of the most important factors in determining its price!''')
 
 if __name__ == "__main__":
     main()

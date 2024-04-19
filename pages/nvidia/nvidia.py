@@ -11,6 +11,7 @@ import tensorflow as tf
 import keras
 import st_pages
 from st_pages import Page, show_pages, Section, add_page_title
+import pickle
 
 st.markdown("""
 <style>
@@ -27,8 +28,8 @@ show_pages(
         Page("pages/indicators.py", "Technical Indicators", ":money_with_wings:"),
         Section(name="Model Results", icon=":chart_with_upwards_trend:"),
         Page("pages/base/base_model.py", "Base Model", ":dollar:"),
-        Page("pages/nvidia/david.py", "David", ":euro:"),
-        Page("pages/nvidia/nvidia.py", "NVIDIA", ":pound:"),
+        Page("pages/nvidia/nvidia.py", "NVIDIA", ":euro:"),
+        Page("pages/nvidia/nvidia2.py", "NVIDIA v2", ":pound:"),
         Page("pages/soon.py", "Coming Soon...", ":eyes:"),
     ]
 )
@@ -36,7 +37,24 @@ show_pages(
 st_pages.add_indentation()
 
 def main():
-    st.title("Shayan and David")
+    cc1, cc2 = st.columns([0.8, 0.2])
+    with cc1:
+        st.title("NVIDIA Daily Trend Prediction")
+
+    with cc2:
+        st.image("images/nvidia_logo.png", width=175)
+
+    st.write(
+        '''
+        ***
+        NVIDIA has been a hot company and we want to hop on that train! We set out to find the most relevant factors in predicting
+        the probability that the price will increase or decrease in the next close so that we know what factors are important. 
+
+        ⇨ Shayan Sinha and David Sanico
+        ***
+    '''
+    )
+
     # model = keras.models.load_model('pages/david/discreteStock.keras')
     data = yf.download(tickers = 'NVDA')
     df = data.copy()
@@ -124,13 +142,18 @@ def main():
     X_train, X_test = X[:splitlimit], X[splitlimit:]
     y_train, y_test = y[:splitlimit], y[splitlimit:]
     # y_pred = model.predict(X_test)
+
+    with open("pages/nvidia/nvidia_y_pred.pkl", 'rb') as f:
+        y_pred = pickle.load(f)
+
     plt.figure(figsize=(16,8))
     plt.plot(y_test, color = 'black', label = 'Test')
-    # plt.plot(y_pred, color = 'green', label = 'pred')
+    plt.plot(y_pred, color = 'green', label = 'Predicted')
     plt.legend()
+    plt.xlim(0, 225)
 
     st.header("Graph of stock movement vs predicted")
-    st.text("The model shows that for any given day it's guesses for whether a stock would move up or down is roughly 50%, which supports the efficient markets hypothesis")
+    st.write("The model shows that for any given day it's guesses for whether a stock would move up or down is roughly 50%, which supports the efficient markets hypothesis!")
     st.pyplot(plt)
 
 

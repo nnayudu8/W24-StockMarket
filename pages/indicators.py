@@ -19,8 +19,8 @@ show_pages(
         Page("pages/indicators.py", "Technical Indicators", ":money_with_wings:"),
         Section(name="Model Results", icon=":chart_with_upwards_trend:"),
         Page("pages/base/base_model.py", "Base Model", ":dollar:"),
-        Page("pages/nvidia/david.py", "David", ":euro:"),
-        Page("pages/nvidia/nvidia.py", "NVIDIA", ":pound:"),
+        Page("pages/nvidia/nvidia.py", "NVIDIA", ":euro:"),
+        Page("pages/nvidia/nvidia2.py", "NVIDIA v2", ":pound:"),
         Page("pages/soon.py", "Coming Soon...", ":eyes:"),
     ]
 )
@@ -43,7 +43,7 @@ st.write(
 st.image("images/EMA_graph.png")
 st.write(
     '''
-    So in this graph, there is a 10, 21, and 50 day EMA, aka fast, medium, and slow moving averages, respectively. As the name
+    So in this graph, there are 10, 21, and 50 day EMAs, aka fast, medium, and slow moving averages, respectively. As the name
     indicates, the fast moving average adjusts to recent day much more precisely, whereas the slow moving average captures more
     long term trends. So to interpret this, if a stock's price crosses multiple EMAs, a new trend is generally indicated. So
     for example, the first circle indicates when the start of a positive trend can be assumed!
@@ -52,3 +52,34 @@ st.write(
     )
 
 st.subheader("Relative Strength Index (RSI)")
+st.write(
+    '''
+    The basic idea of gaming the stock market is to buy low and sell high. RSI is a great indicator to do just that!
+    '''
+    )
+st.image("images/RSI.png")
+st.write(
+    '''
+    The values of RSI range between 0 and 100. A stock is considered oversold when RSI is closer to 0, and overbought when it 
+    is closer to 100. This is calculated using the gains and losses over a time interval, so a generally accepted pattern is 
+    to buy when below 30 and sell when over 70!
+    ***
+    '''
+    )
+
+st.subheader("Average Directional Index (ADX)")
+st.write(
+    '''
+    Above, we saw EMAs are great for determining trends. But trends can be weak or strong, how do we know to trust it with our 
+    money? Well, that's primarily what ADX is used for!
+    '''
+    )
+st.image("images/ADX.png")
+st.write(
+    '''
+    The values of ADX range between 0 and 100. Note that ADX **IS NOT** a bullish or bearish signal, it just determines the 
+    strength of a trend. When ADX is below 25, it is considered a weak trend, and when above, it is considering strong. So ideally, 
+    we want a positive moving EMA with as high of a corresponding ADX value as possible!
+    ***
+    '''
+    )
