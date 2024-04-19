@@ -26,10 +26,15 @@ show_pages(
 
 st_pages.add_indentation()
 
+cc1, cc2 = st.columns([0.8, 0.2])
+with cc1:
+    st.title("Stock Market Predictive Analysis")
+
+with cc2:
+    st.image("images/MDST_Logo.png", width=125)
+
 st.write(
     '''
-# Stock Market Prediction
-
 ***
 
 **⇦ Check the tabs to the left for research and model-specific results!** (top left corner for mobile users)
@@ -40,9 +45,7 @@ st.write(
 
 As daunting as the stock market may seem, it typically follows certain trends. Many of us have investments in the market, or will eventually, so it is important (and interesting) to understand what could influence stock prices. Using past market data, we can highlight the important factors that do just that. Then using that information, we can build a model to predict stock price trends!
 
-This is a repository containing the work done for the Stock Market Prediction project at the Michigan Data Science Team during the Winter semester of 2024. The project's main objective was to leverage machine learning methods to accurately predict individual stock trends and their primary factors, given a range of their historical data. Generating the next day's price was outside of the scope of the project.
-
-This repository contains several approaches to solving this task, using varied model architectures and datasets. We enumerate them below in the **Stock Trend Prediction Models** section. We also created front-end interfaces for displaying our results and getting predictions from our versatile, base model, which are described in the **Streamlit** section.
+This website contains the work done for the Stock Market Prediction project at the Michigan Data Science Team during the Winter semester of 2024. The project's main objective was to leverage machine learning methods to accurately predict individual stock trends and their primary factors, given a range of their historical data. Generating the next day's price was outside of the scope of the project.
 
 ## Stock Trend Prediction Models
 
