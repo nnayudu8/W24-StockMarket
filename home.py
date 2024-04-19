@@ -1,11 +1,6 @@
 import streamlit as st
 import st_pages
 from st_pages import Page, show_pages, Section, add_page_title
-import streamlit_extras
-from PIL import Image
-from pathlib import Path
-import base64
-from streamlit_extras.switch_page_button import switch_page
 
 
 st.markdown("""
