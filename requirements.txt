@@ -3,6 +3,7 @@ numpy
 pandas
 st_pages
 streamlit
+scikit-learn
 yfinance
 matplotlib
 pandas_ta
