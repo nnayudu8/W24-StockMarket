@@ -7,4 +7,3 @@ yfinance
 matplotlib
 pandas_ta
 tensorflow
-pickle
