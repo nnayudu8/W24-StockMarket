@@ -54,12 +54,12 @@ Our approaches included using a LSTM neural network in conjunction with a variet
 ### 1. `pages/base/base_model.py -> Google`
 Using a simple LSTM architecture, we trained a neural network on a long term Google Dataset. We transformed data from the `yfinance` API using `pandas_ta` to produce **momentum** based data elements. We leverages the **RSI** and **EMA** technical indicators to achieve this. The predictions of the model were generally poor, and could not generalize to volatility in stock price. This motivated our search for other indicators, datasets, and model architectures, to see if we could achieve better performance.
 
-### 2. `pages/nvidia/presentation.py -> NVIDIA`
+### 2. `pages/nvidia/nvidia.py -> NVIDIA`
 We move to a more predicting a more volatile, recently popular stock. We used **Average True Range**  and **On-Balance Volume** in addition to our previous indicators to aid the volatility of the stock.
 
 It turns out that the model performs quite well and it is generalizing well to values outside of the dataset since it uses trends as technical indicators to make inputs.
 
-### Conclusions
+## Conclusions
 The minimal availability of useful data along with the volatility of certain stocks make it abundantly clear why it is hard to predict stock trends. But we found alternative routes to make the project a positive learning experience, covering topics from interfacing with APIs in python, to researching the stock market for useful technical indicators and manually tuning hyperparameters of LSTM Neural Networks. Future iterations of the project should preprocess many stocks through a clustering to identify which stocks affect each other, and follow similar trends. Though this is a large undertaking, it adds a layer of practicality to the current model.
 
 ## Streamlit
