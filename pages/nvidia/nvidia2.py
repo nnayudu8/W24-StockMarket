@@ -13,6 +13,13 @@ import st_pages
 from st_pages import Page, show_pages, Section, add_page_title
 import pickle
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
+import tensorflow as tf
+tf.config.set_visible_devices([], 'GPU')  # Ensure GPU is not used
+
 st.markdown("""
 <style>
 	[data-testid="stHeader"] {
@@ -56,20 +63,21 @@ def main():
     )
 
     data = yf.download(tickers = 'NVDA')
+    data.columns = data.columns.droplevel(1)
     df = data.copy()
     df.reset_index(inplace = True)
     extrema = 0.05
     for i in range(8,len(df)-8):
-        if(((df["Adj Close"].iloc[i-7]-df["Adj Close"].iloc[i]) / df["Adj Close"].iloc[i]) > extrema) and (((df["Adj Close"].iloc[i+7]-df["Adj Close"].iloc[i]) / df["Adj Close"].iloc[i]) > extrema):
+        if(((df["Close"].iloc[i-7]-df["Close"].iloc[i]) / df["Close"].iloc[i]) > extrema) and (((df["Close"].iloc[i+7]-df["Close"].iloc[i]) / df["Close"].iloc[i]) > extrema):
             df.loc[i,"minmax"] = -1
-        elif (((df["Adj Close"].iloc[i]-df["Adj Close"].iloc[i+7]) / df["Adj Close"].iloc[i]) > extrema) and (((df["Adj Close"].iloc[i]-df["Adj Close"].iloc[i-7]) / df["Adj Close"].iloc[i]) > extrema):
+        elif (((df["Close"].iloc[i]-df["Close"].iloc[i+7]) / df["Close"].iloc[i]) > extrema) and (((df["Close"].iloc[i]-df["Close"].iloc[i-7]) / df["Close"].iloc[i]) > extrema):
             df.loc[i,"minmax"] = 1
         else:
             df.loc[i,"minmax"] = 0
 
     
     plt.figure(figsize=(16,8))
-    plt.plot(df["Adj Close"][4000:], color = 'black', label = 'Test')
+    plt.plot(df["Close"][4000:], color = 'black', label = 'Test')
 
     for index, row in df.iterrows():
         if row['minmax'] == 1:
@@ -94,12 +102,12 @@ def main():
     data['OBV']=ta.obv(data.Close, data.Volume, length=15)
     data['ATR']=ta.atr(data.High, data.Low, data.Close, length=15)
 
-    data['Target'] = data['Adj Close']-data.Open
+    data['Target'] = data['Close']-data.Open
     data['Target'] = data['Target'].shift(-1)
 
     data['TargetClass'] = [1 if data.Target[i]>0 else 0 for i in range(len(data))]
 
-    data['DeltaNextClose'] = (data['Adj Close'].shift(-1))-data['Adj Close']
+    data['DeltaNextClose'] = (data['Close'].shift(-1))-data['Close']
 
     data.dropna(inplace=True)
     data.reset_index(inplace = True)

@@ -20,6 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas_ta as ta
 import streamlit as st
+import keras
 
 from keras.models import Sequential
 from keras.layers import LSTM
@@ -28,7 +29,6 @@ from keras.layers import Dense
 from keras.layers import TimeDistributed
 
 import tensorflow as tf
-import keras
 from keras import optimizers
 from keras.callbacks import History
 from keras.models import Model
@@ -37,6 +37,13 @@ import numpy as np
 import st_pages
 from st_pages import Page, show_pages, Section, add_page_title
 import pickle
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
+import tensorflow as tf
+tf.config.set_visible_devices([], 'GPU')  # Ensure GPU is not used
 
 st.markdown("""
 <style>
@@ -81,7 +88,9 @@ def main():
     '''
     )
 
-    data = yf.download(tickers = 'NVDA')
+    data = yf.download(tickers = ['NVDA'])
+    data.columns = data.columns.droplevel(1)
+    st.write(data)
 
     data['RSI']=ta.rsi(data.Close, length=15)
     data['EMAF']=ta.ema(data.Close, length=20)
@@ -90,6 +99,11 @@ def main():
 
     ###ADD MORE INDICATORS###
     #OBV = on-balance volume
+    if data.empty or data.isnull().values.all():
+        st.write(data)
+        st.error("Data is empty or contains all NaN values. Check your ticker symbol or internet connection.")
+        return
+
     data['OBV']=ta.obv(data.Close, data.Volume)
 
     #ADX = avg directional movement index
@@ -126,7 +140,7 @@ def main():
     st.write('''Here is the adjusted close of NVIDIA stock everyday since around the year 2000! From this, we understood
              that the stock has recently been a lot more volatile, and that is something for which we need to account.''')
     plt.figure(figsize=(16,8))
-    plt.plot(data["Adj Close"], color = 'black', label = 'Price')
+    plt.plot(data["Close"], color = 'black', label = 'Price')
     plt.title("Adjusted Close")
     st.pyplot(plt)
 
@@ -135,7 +149,7 @@ def main():
              others indicates a potential trend change. For NVIDIA, it seems that there have been many more positive trends
              lately than negative ones! Feel free to refer to the ***Technical Indicators*** tab for a full description of EMAs.''')
     plt.figure(figsize=(16,8))
-    plt.plot(data["Adj Close"], '--', color = 'black', label = 'Adj Close', linewidth = 1)
+    plt.plot(data["Close"], '--', color = 'black', label = 'Adj Close', linewidth = 1)
     plt.plot(data["EMAF"], color = 'purple', label = 'EMAF', linewidth = 1)
     plt.plot(data["EMAM"], color = 'green', label = 'EMAM', linewidth = 1)
     plt.plot(data["EMAS"], color = 'blue', label = 'EMAS', linewidth = 1)
@@ -169,12 +183,12 @@ def main():
 
 
     ###DATASET INDEXING###
-    data['Target'] = data['Adj Close']-data.Open
+    data['Target'] = data['Close']-data.Open
     data['Target'] = data['Target'].shift(-1)
 
     data['TargetClass'] = [1 if data.Target[i]>0 else 0 for i in range(len(data))]
 
-    data['TargetNextClose'] = data['Adj Close'].shift(-1)
+    data['TargetNextClose'] = data['Close'].shift(-1)
 
     data.dropna(inplace=True)
 
